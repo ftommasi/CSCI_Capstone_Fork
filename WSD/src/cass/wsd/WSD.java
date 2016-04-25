@@ -114,7 +114,7 @@ public class WSD {
 				// for each sense of the current context word, find the sense with the minimum distance to the current target sense
 				Set<CASSWordSense> contextWordSenses = lTool.getSenses(contextWord);
 				
-				int bestScore = 0;
+				int bestScore = Integer.MAX_VALUE;
 				for (CASSWordSense contextWordSense : contextWordSenses) {
 					
 					int currentScore = lTool.getHypernymDistanceScore(targetSense, contextWordSense);
