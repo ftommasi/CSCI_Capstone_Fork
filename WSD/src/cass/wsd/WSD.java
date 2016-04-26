@@ -45,7 +45,7 @@ public class WSD {
 	
 	List<ScoredSense> scoreSensesUsing(Algorithm algorithm) {
 		
-		List<ScoredSense> scoredSenses;
+		List<ScoredSense> scoredSenses = null;
 		
 		switch (algorithm) {
 		case LESK:
@@ -66,7 +66,7 @@ public class WSD {
 			
 		default:
 			// TODO throw proper exception
-			return null;
+			break;
 		}
 		
 		return scoredSenses;
@@ -105,15 +105,8 @@ public class WSD {
 	
 	private List<ScoredSense> scoreSensesUsingStochasticHypernymDistance() {
 		List<ScoredSense> scoredSenses= new ArrayList<ScoredSense>();
-		
-		for (CASSWordSense targetSense : targetSenses) {
-			int senseScore = 0;
-		
-			for (String contextWord : context) {
 				
-				// for each sense of the current context word, find the sense with the minimum distance to the current target sense
-				Set<CASSWordSense> contextWordSenses = lTool.getSenses(contextWord);
-				
+<<<<<<< HEAD
 				int bestScore = Integer.MAX_VALUE;
 				for (CASSWordSense contextWordSense : contextWordSenses) {
 					
@@ -123,7 +116,20 @@ public class WSD {
 					}
 				}
 				senseScore += bestScore;
+=======
+		for (CASSWordSense targetSense : targetSenses) {
+			
+			Integer senseScore = null;
+			
+			if (targetSense.getPOS() == "noun") {
+				senseScore = scoreTargetSensesUsingHypernymDistance(targetSense);
 			}
+			
+			if (senseScore == null) {
+				senseScore = Integer.MAX_VALUE;
+>>>>>>> 474a43f5c4a1b203e55d5d64d08c5f4c3b85031d
+			}
+			
 			scoredSenses.add(new ScoredSense(targetSense, senseScore));
 		}
 		
@@ -131,6 +137,39 @@ public class WSD {
 		Collections.sort(scoredSenses);
 		
 		return scoredSenses;
+	}
+	
+	private Integer scoreTargetSensesUsingHypernymDistance(CASSWordSense targetSense) {
+		
+		List<CASSWordSense> targetHypernymChain = lTool.getHypernymAncestors(targetSense);
+		if ((targetHypernymChain == null) || (targetHypernymChain.isEmpty())) {
+			return null;
+		}
+		
+		int senseScore = 0;
+		
+		// loop over all context words
+		for (String contextWord : context) {
+			Set<CASSWordSense> contextWordSenses = lTool.getSenses(contextWord);
+			int contextWordBestScore = Integer.MAX_VALUE;
+			if (!contextWordSenses.isEmpty()) {
+				// loop over all senses of context word
+				for (CASSWordSense contextWordSense : contextWordSenses) {
+					if (contextWordSense.getPOS() == "noun") {
+						List<CASSWordSense> contextWordHypernymChain = lTool.getHypernymAncestors(contextWordSense);
+						Integer score = lTool.getHypernymDistanceScore(targetHypernymChain, contextWordHypernymChain);
+						if ((score != null) && (score < contextWordBestScore)) {
+							contextWordBestScore = score;
+						}
+					}
+				}
+			}
+			if (contextWordBestScore == Integer.MAX_VALUE) {
+				contextWordBestScore = 0;
+			}
+			senseScore += contextWordBestScore;
+		}
+		return senseScore;
 	}
 	
 	private List<ScoredSense> scoreSensesUsingTagFrequency() {
