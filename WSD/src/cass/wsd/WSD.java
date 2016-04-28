@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Collections;
+import java.util.Arrays;
 
 import cass.languageTool.*;
 import cass.languageTool.wordNet.CASSWordSense;
@@ -15,6 +16,7 @@ public class WSD {
 	private LanguageTool lTool;
 	private List<String> context;
 	private String target;
+	private static final String[] badStringList = new String[] {"the", "a", "an", "is", "are", "be"};
 	
 	public WSD(String leftContext, String target, String rightContext, Language language) {
 		lTool = new LanguageTool(language);
@@ -79,16 +81,28 @@ public class WSD {
 		// filter allTargetSenses, save to filteredSenses
 		
 		// TODO: FAUSTO
-		return leskIntenal(filteredSenses);
+		return leskInternal(filteredSenses);
 	}
 	
 	private List<ScoredSense> scoreSensesUsingLesk() {
-		return leskIntenal(lTool.getSenses(target));
+		return leskInternal(lTool.getSenses(target));
 	}
 	
-	private List<ScoredSense> leskIntenal(Set<CASSWordSense> targetSenses) {
+	private List<String> getPrunedGlossSet(List<String> tokenlist) {
+		List<String> prunedGloss = new ArrayList<String>();;
+		
+		for (String s : tokenlist) {
+			if (!(Arrays.asList(badStringList).contains(s))) {
+				prunedGloss.add(s);
+			}
+		}
+		
+		return prunedGloss;
+	}
+	
+	private List<ScoredSense> leskInternal(Set<CASSWordSense> targetSenses) {
 		// context set is set of words in context
-				Set<String> contextSet = new HashSet<String>(context);
+				Set<String> contextSet = new HashSet<String>(getPrunedGlossSet(context));
 				
 				Set<String> glossSet = new HashSet<String>();
 				List<ScoredSense> scoredSenses= new ArrayList<ScoredSense>();
@@ -98,7 +112,7 @@ public class WSD {
 					// clear and add lemmatized tokens of gloss to set
 					glossSet.clear();
 					String definition = lTool.getDefinition(targetSense);
-					glossSet.addAll(lTool.tokenizeAndLemmatize(definition));
+					glossSet.addAll(getPrunedGlossSet(lTool.tokenizeAndLemmatize(definition)));
 					
 					// find intersection of sets
 					glossSet.retainAll(contextSet);
