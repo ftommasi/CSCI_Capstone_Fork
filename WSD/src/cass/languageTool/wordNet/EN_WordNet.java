@@ -117,8 +117,23 @@ public class EN_WordNet implements I_WordNet {
 	public Set<CASSWordSense> getHypernyms(CASSWordSense sense) {
 		Set<CASSWordSense> hypernyms = new HashSet<CASSWordSense>();
 		ISynset synset = getSynset(sense);
+		List<ISynsetID> hyperlist = new ArrayList<ISynsetID>();
+    	if (sense.getPOS() == "adjective" | sense.getPOS() == "adverb") {
+    		// Some nouns are related by pertainym pointer to an adj/adv; this code tries to trace back to the noun
+    		List<ISynsetID> related = synset.getRelatedSynsets();
+    		for (ISynsetID relatedSynsetID : related) {
+    			ISynset relatedSynset = dict.getSynset(relatedSynsetID);
+    			List<ISynsetID> checkList = relatedSynset.getRelatedSynsets(Pointer.PERTAINYM);
+    			for (ISynsetID check : checkList) {
+    				if (dict.getSynset(check).toString().equals(synset.toString())) {
+    					synset = relatedSynset;
+    				}
+    			}
+    		}
+    	}
     	
-    	List<ISynsetID> hyperlist = synset.getRelatedSynsets(Pointer.HYPERNYM);
+    	hyperlist = synset.getRelatedSynsets(Pointer.HYPERNYM);
+    	
     	List<IWord> wordlist = new ArrayList<IWord>();
     	for (ISynsetID synsetID : hyperlist) {
     		wordlist.addAll(dict.getSynset(synsetID).getWords());
