@@ -1,8 +1,20 @@
 # CSCI_Capstone
 
-CASS (Context Aware Synonym Suggestion) strives to create an environment in OpenOffice/LibreOffice that implements these advanced algorithms in a way that are easy for any user to make use of. The goal of CASS is to improve how large bodies of text are processed. It provides tools for users that allow them to easily parse through redundant words in a text and substitute them with words that fit in the current context 
+CASS (Context Aware Synonym Suggestion) strives to create an environment in OpenOffice/LibreOffice that implements advanced Word Sense Disambiguation algorithms in user friendly way. The goal of CASS is to improve how large bodies of text are processed. It provides tools that allow for better parsing through redundant words in a text and substitute them with synonyms that are a better fit in the current context. Traditional Thesauri, especially in word processing software, have no way of suggesting more appropriate words in any given context. The goal for this project is to provide a better way for users to edit documents.  
 
 CASS is a context sensitive Synonym Suggester that makes use of WordNet as a knowledge source to retrieve synsets, definitions, word senses, and other details for given words. CASS is built using Word Sense Disambiguiation algorithns, both existing and improved, in order to create a list of synonym suggestions that are accurate and relevant to the user based on the context for any given word. 
+
+Installation Guide(Requires only minimal configuration and tweaking):
+
+
+1.Install the .oxt file by using your extension manager in open office (under tools->extension manager)
+Link to .oxt https://drive.google.com/uc?export=download&id=0BxoeFOWirXrNU0VBNFVyT2NNUmM
+2. Move the following directory folder to /usr/lib/
+https://drive.google.com/uc?export=download&id=0BxoeFOWirXrNajJmeXhwcWtTVlE
+
+Once the extension is installed you will be able to execute it, and get your smarter suggestions, by running the macro called CASS (find under tool->macro->run macro)
+
+How to add a button for a macro in an OpenOffice document https://help.libreoffice.org/Common/Inserting_and_Editing_Buttons
 
 CASS is an open source project that abides by GNU open source license:
 
